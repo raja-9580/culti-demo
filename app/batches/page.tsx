@@ -1,14 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import Badge from '@/components/ui/Badge';
 import FloatingActionButton from '@/components/ui/FloatingActionButton';
-import { mockBatches } from '@/lib/mock-data';
-import { MUSHROOM_TYPES, BatchStatus } from '@/lib/types';
+import { MUSHROOM_TYPES, BatchStatus, Batch } from '@/lib/types';
 import Link from 'next/link';
 
 const statusVariantMap: Record<BatchStatus, 'success' | 'warning' | 'info' | 'danger' | 'neutral'> = {
@@ -20,7 +19,8 @@ const statusVariantMap: Record<BatchStatus, 'success' | 'warning' | 'info' | 'da
   [BatchStatus.Archived]: 'neutral',
 };
 
-function formatDate(date: Date | string): string {
+function formatDate(date: Date | string | null | undefined): string {
+  if (!date) return '—';
   const d = typeof date === 'string' ? new Date(date) : date;
   return d.toLocaleDateString('en-US', {
     year: 'numeric',
@@ -30,6 +30,7 @@ function formatDate(date: Date | string): string {
 }
 
 export default function BatchesPage() {
+  const [batches, setBatches] = useState<Batch[]>([]);
   const [filters, setFilters] = useState({
     mushroomType: '',
     status: '',
@@ -38,7 +39,22 @@ export default function BatchesPage() {
   });
   const [showFilters, setShowFilters] = useState(false);
 
-  const filteredBatches = mockBatches.filter((batch) => {
+  useEffect(() => {
+    async function fetchBatches() {
+      try {
+        const res = await fetch('/api/batches');
+        const data = await res.json();
+        if (data.batches) {
+          setBatches(data.batches);
+        }
+      } catch (error) {
+        console.error('Failed to fetch batches:', error);
+      }
+    }
+    fetchBatches();
+  }, []);
+
+  const filteredBatches = batches.filter((batch) => {
     if (filters.mushroomType && batch.mushroomType !== filters.mushroomType) {
       return false;
     }
@@ -183,7 +199,7 @@ export default function BatchesPage() {
           </div>
         )}
       </Card>
-      
+
       <FloatingActionButton actions={[
         { label: 'Create Batch', icon: '➕', href: '/batches' },
         { label: 'QR Scan', icon: '📱', href: '/batches' },

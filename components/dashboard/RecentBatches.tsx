@@ -14,7 +14,8 @@ const statusVariantMap: Record<BatchStatus, 'success' | 'warning' | 'info' | 'da
   [BatchStatus.Archived]: 'neutral',
 };
 
-function formatDate(date: Date | string): string {
+function formatDate(date: Date | string | null | undefined): string {
+  if (!date) return '—';
   const d = typeof date === 'string' ? new Date(date) : date;
   return d.toLocaleDateString('en-US', {
     year: 'numeric',

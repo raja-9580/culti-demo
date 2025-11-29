@@ -1,11 +1,11 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import BatchQrPanel from '@/components/batches/BatchQrPanel';
-import { mockBatches } from '@/lib/mock-data';
-import { BatchStatus } from '@/lib/types';
+import { BatchStatus, Batch } from '@/lib/types';
 import Link from 'next/link';
 
 const statusVariantMap: Record<BatchStatus, 'success' | 'warning' | 'info' | 'danger' | 'neutral'> = {
@@ -17,7 +17,8 @@ const statusVariantMap: Record<BatchStatus, 'success' | 'warning' | 'info' | 'da
   [BatchStatus.Archived]: 'neutral',
 };
 
-function formatDate(date: Date | string): string {
+function formatDate(date: Date | string | null | undefined): string {
+  if (!date) return '—';
   const d = typeof date === 'string' ? new Date(date) : date;
   return d.toLocaleDateString('en-US', {
     year: 'numeric',
@@ -31,7 +32,30 @@ export default function BatchDetailPage({
 }: {
   params: { id: string };
 }) {
-  const batch = mockBatches.find((b) => b.id === params.id);
+  const [batch, setBatch] = useState<Batch | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchBatch() {
+      try {
+        const res = await fetch('/api/batches');
+        const data = await res.json();
+        if (data.batches) {
+          const found = data.batches.find((b: Batch) => b.id === params.id);
+          setBatch(found || null);
+        }
+      } catch (error) {
+        console.error('Failed to fetch batch:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchBatch();
+  }, [params.id]);
+
+  if (loading) {
+    return <div className="p-8 text-center text-gray-400">Loading batch details...</div>;
+  }
 
   if (!batch) {
     return (

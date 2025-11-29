@@ -14,7 +14,8 @@ const statusVariantMap: Record<BagletStatus, 'success' | 'warning' | 'info' | 'd
   [BagletStatus.Harvested]: 'neutral',
 };
 
-function formatDate(date: Date | string): string {
+function formatDate(date: Date | string | null | undefined): string {
+  if (!date) return '—';
   const d = typeof date === 'string' ? new Date(date) : date;
   return d.toLocaleDateString('en-US', {
     year: 'numeric',
@@ -78,11 +79,11 @@ export default function RecentBaglets({ baglets }: { baglets: Baglet[] }) {
                 <td className="py-3 md:py-3.5 px-2 md:px-3 text-gray-500 text-xs leading-relaxed hidden lg:table-cell">
                   {baglet.metrics
                     ? (
-                        <div>
-                          <div>{baglet.metrics.temperature}°C</div>
-                          <div>{baglet.metrics.co2Level} ppm</div>
-                        </div>
-                      )
+                      <div>
+                        <div>{baglet.metrics.temperature}°C</div>
+                        <div>{baglet.metrics.co2Level} ppm</div>
+                      </div>
+                    )
                     : '—'}
                 </td>
               </tr>

@@ -1,11 +1,11 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import FloatingActionButton from '@/components/ui/FloatingActionButton';
-import { mockBaglets } from '@/lib/mock-data';
-import { BagletStatus } from '@/lib/types';
+import { BagletStatus, Baglet } from '@/lib/types';
 import Link from 'next/link';
 
 const statusVariantMap: Record<BagletStatus, 'success' | 'warning' | 'info' | 'danger' | 'neutral'> = {
@@ -17,7 +17,8 @@ const statusVariantMap: Record<BagletStatus, 'success' | 'warning' | 'info' | 'd
   [BagletStatus.Harvested]: 'neutral',
 };
 
-function formatDate(date: Date | string): string {
+function formatDate(date: Date | string | null | undefined): string {
+  if (!date) return '—';
   const d = typeof date === 'string' ? new Date(date) : date;
   return d.toLocaleDateString('en-US', {
     year: 'numeric',
@@ -27,6 +28,23 @@ function formatDate(date: Date | string): string {
 }
 
 export default function BagletsPage() {
+  const [baglets, setBaglets] = useState<Baglet[]>([]);
+
+  useEffect(() => {
+    async function fetchBaglets() {
+      try {
+        const res = await fetch('/api/baglets');
+        const data = await res.json();
+        if (data.baglets) {
+          setBaglets(data.baglets);
+        }
+      } catch (error) {
+        console.error('Failed to fetch baglets:', error);
+      }
+    }
+    fetchBaglets();
+  }, []);
+
   return (
     <div>
       <div className="flex items-center justify-between mb-4 md:mb-5">
@@ -60,7 +78,7 @@ export default function BagletsPage() {
               </tr>
             </thead>
             <tbody>
-              {mockBaglets.map((baglet) => (
+              {baglets.map((baglet) => (
                 <tr
                   key={baglet.id}
                   className="border-b border-gray-800/10 hover:bg-dark-surface-light/15 transition-colors"
@@ -82,11 +100,11 @@ export default function BagletsPage() {
                   <td className="py-3 md:py-3.5 px-2 md:px-4 text-gray-500 text-xs leading-relaxed hidden lg:table-cell">
                     {baglet.metrics
                       ? (
-                          <div>
-                            <div>{baglet.metrics.temperature}°C</div>
-                            <div>{baglet.metrics.co2Level} ppm</div>
-                          </div>
-                        )
+                        <div>
+                          <div>{baglet.metrics.temperature}°C</div>
+                          <div>{baglet.metrics.co2Level} ppm</div>
+                        </div>
+                      )
                       : '—'}
                   </td>
                   <td className="py-2 md:py-3 px-2 md:px-4">
