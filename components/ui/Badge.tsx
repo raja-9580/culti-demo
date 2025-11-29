@@ -7,17 +7,17 @@ interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
 const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
   ({ variant = 'neutral', className = '', ...props }, ref) => {
     const variantStyles = {
-      success: 'bg-green-900/40 text-green-300 border border-green-800/50 rounded-full',
-      warning: 'bg-amber-900/40 text-amber-300 border border-amber-800/50 rounded-full',
-      info: 'bg-cyan-900/40 text-cyan-300 border border-cyan-800/50 rounded-full',
-      danger: 'bg-red-900/40 text-red-300 border border-red-800/50 rounded-full',
-      neutral: 'bg-gray-800/40 text-gray-400 border border-gray-700/50 rounded-full',
+      success: 'bg-accent-leaf/8 text-accent-leaf border border-accent-leaf/20 rounded-full',
+      warning: 'bg-amber-600/8 text-amber-300 border border-amber-600/20 rounded-full',
+      info: 'bg-accent-sky/8 text-accent-sky border border-accent-sky/20 rounded-full',
+      danger: 'bg-red-600/8 text-red-300 border border-red-600/20 rounded-full',
+      neutral: 'bg-gray-600/8 text-gray-400 border border-gray-600/20 rounded-full',
     };
 
     return (
       <div
         ref={ref}
-        className={`inline-block px-3 py-1 text-xs font-medium ${variantStyles[variant]} ${className}`}
+        className={`inline-block px-2 py-0.5 text-xs font-medium rounded-full ${variantStyles[variant]} badge-animate ${className}`}
         {...props}
       />
     );

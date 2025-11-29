@@ -27,30 +27,30 @@ export default function RecentBaglets({ baglets }: { baglets: Baglet[] }) {
   const recent = baglets.slice(0, 5);
 
   return (
-    <Card variant="default">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-100">📦 Recent Baglets</h3>
-        <Link href="/baglets" className="text-accent-leaf text-sm hover:text-accent-sky transition-colors">
+    <Card>
+      <div className="flex items-center justify-between mb-4 md:mb-5">
+        <h3 className="text-base md:text-lg font-semibold text-gray-100">Recent Baglets</h3>
+        <Link href="/baglets" className="text-accent-leaf text-xs md:text-sm hover:text-accent-sky transition-colors">
           View all →
         </Link>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full text-xs md:text-sm">
           <thead>
-            <tr className="border-b border-gray-700/50">
-              <th className="text-left py-3 px-3 font-semibold text-gray-300">
+            <tr className="border-b border-gray-800/20 bg-dark-surface-light/60 backdrop-blur-sm">
+              <th className="text-left py-2.5 md:py-3 px-2 md:px-3 font-semibold text-gray-200 text-xs">
                 Baglet ID
               </th>
-              <th className="text-left py-3 px-3 font-semibold text-gray-300">
+              <th className="text-left py-2.5 md:py-3 px-2 md:px-3 font-semibold text-gray-200 text-xs">
                 Batch
               </th>
-              <th className="text-left py-3 px-3 font-semibold text-gray-300">
+              <th className="text-left py-2.5 md:py-3 px-2 md:px-3 font-semibold text-gray-200 text-xs">
                 Status
               </th>
-              <th className="text-left py-3 px-3 font-semibold text-gray-300">
-                Last Update
+              <th className="text-left py-2.5 md:py-3 px-2 md:px-3 font-semibold text-gray-200 text-xs hidden md:table-cell">
+                Updated
               </th>
-              <th className="text-left py-3 px-3 font-semibold text-gray-300">
+              <th className="text-left py-2.5 md:py-3 px-2 md:px-3 font-semibold text-gray-200 text-xs hidden lg:table-cell">
                 Metrics
               </th>
             </tr>
@@ -59,23 +59,23 @@ export default function RecentBaglets({ baglets }: { baglets: Baglet[] }) {
             {recent.map((baglet) => (
               <tr
                 key={baglet.id}
-                className="border-b border-gray-700/50 hover:bg-dark-surface-light/50 transition-colors"
+                className="border-b border-gray-800/10 hover:bg-dark-surface-light/15 transition-colors"
               >
-                <td className="py-4 px-3 text-accent-leaf font-medium">{baglet.id}</td>
-                <td className="py-4 px-3">
-                  <Link href={`/batches`} className="text-gray-400 hover:text-gray-300">
+                <td className="py-3 md:py-3.5 px-2 md:px-3 text-accent-leaf font-medium text-xs md:text-sm">{baglet.id}</td>
+                <td className="py-3 md:py-3.5 px-2 md:px-3">
+                  <Link href={`/batches`} className="text-gray-400 hover:text-gray-300 text-xs md:text-sm">
                     {baglet.batchId}
                   </Link>
                 </td>
-                <td className="py-4 px-3">
+                <td className="py-3 md:py-3.5 px-2 md:px-3">
                   <Badge variant={statusVariantMap[baglet.status]}>
                     {baglet.status}
                   </Badge>
                 </td>
-                <td className="py-4 px-3 text-gray-500 text-xs">
+                <td className="py-3 md:py-3.5 px-2 md:px-3 text-gray-500 text-xs hidden md:table-cell">
                   {formatDate(baglet.lastStatusChange)}
                 </td>
-                <td className="py-4 px-3 text-gray-500 text-xs leading-relaxed">
+                <td className="py-3 md:py-3.5 px-2 md:px-3 text-gray-500 text-xs leading-relaxed hidden lg:table-cell">
                   {baglet.metrics
                     ? (
                         <div>

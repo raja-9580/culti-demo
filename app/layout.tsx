@@ -18,7 +18,7 @@ export default function RootLayout({
       <body className="bg-dark-bg text-gray-100">
         <Sidebar />
         <Topbar />
-        <main className="md:ml-64 mt-16 p-4 md:p-6">
+        <main className="md:ml-64 mt-13 md:mt-14 p-3 md:p-6">
           <div className="max-w-7xl mx-auto">
             {children}
           </div>

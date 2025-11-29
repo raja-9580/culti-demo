@@ -3,6 +3,7 @@
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
+import FloatingActionButton from '@/components/ui/FloatingActionButton';
 import { mockBaglets } from '@/lib/mock-data';
 import { BagletStatus } from '@/lib/types';
 import Link from 'next/link';
@@ -28,32 +29,32 @@ function formatDate(date: Date | string): string {
 export default function BagletsPage() {
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-accent-leaf to-accent-sky bg-clip-text text-transparent">📦 Baglets</h1>
+      <div className="flex items-center justify-between mb-4 md:mb-5">
+        <h1 className="text-xl md:text-2xl font-semibold text-accent-leaf">Baglets</h1>
       </div>
 
       {/* Baglets Table */}
-      <Card variant="default">
+      <Card className="border border-gray-800/30">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-xs md:text-sm">
             <thead>
-              <tr className="border-b border-gray-700/50">
-                <th className="text-left py-3 px-4 font-semibold text-gray-300">
+              <tr className="border-b border-gray-800/20 bg-dark-surface-light/60 backdrop-blur-sm">
+                <th className="text-left py-2.5 md:py-3 px-2 md:px-4 font-semibold text-gray-200 text-xs">
                   Baglet ID
                 </th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-300">
+                <th className="text-left py-2.5 md:py-3 px-2 md:px-4 font-semibold text-gray-200 text-xs">
                   Batch ID
                 </th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-300">
+                <th className="text-left py-2.5 md:py-3 px-2 md:px-4 font-semibold text-gray-200 text-xs">
                   Status
                 </th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-300">
-                  Last Update
+                <th className="text-left py-2.5 md:py-3 px-2 md:px-4 font-semibold text-gray-200 text-xs hidden md:table-cell">
+                  Updated
                 </th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-300">
+                <th className="text-left py-2.5 md:py-3 px-2 md:px-4 font-semibold text-gray-200 text-xs hidden lg:table-cell">
                   Metrics
                 </th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-300">
+                <th className="text-left py-2.5 md:py-3 px-2 md:px-4 font-semibold text-gray-200 text-xs">
                   Actions
                 </th>
               </tr>
@@ -62,23 +63,23 @@ export default function BagletsPage() {
               {mockBaglets.map((baglet) => (
                 <tr
                   key={baglet.id}
-                  className="border-b border-gray-700/50 hover:bg-dark-surface-light/50 transition-colors"
+                  className="border-b border-gray-800/10 hover:bg-dark-surface-light/15 transition-colors"
                 >
-                  <td className="py-4 px-4 text-accent-leaf font-medium">{baglet.id}</td>
-                  <td className="py-4 px-4">
-                    <Link href="/batches" className="text-gray-400 hover:text-accent-leaf hover:text-accent-sky transition-colors">
+                  <td className="py-3 md:py-3.5 px-2 md:px-4 text-accent-leaf font-medium text-xs md:text-sm">{baglet.id}</td>
+                  <td className="py-3 md:py-3.5 px-2 md:px-4">
+                    <Link href="/batches" className="text-gray-400 hover:text-accent-sky transition-colors text-xs md:text-sm">
                       {baglet.batchId}
                     </Link>
                   </td>
-                  <td className="py-4 px-4">
+                  <td className="py-3 md:py-3.5 px-2 md:px-4">
                     <Badge variant={statusVariantMap[baglet.status]}>
                       {baglet.status}
                     </Badge>
                   </td>
-                  <td className="py-4 px-4 text-gray-500 text-xs">
+                  <td className="py-3 md:py-3.5 px-2 md:px-4 text-gray-500 text-xs hidden md:table-cell">
                     {formatDate(baglet.lastStatusChange)}
                   </td>
-                  <td className="py-4 px-4 text-gray-500 text-xs leading-relaxed">
+                  <td className="py-3 md:py-3.5 px-2 md:px-4 text-gray-500 text-xs leading-relaxed hidden lg:table-cell">
                     {baglet.metrics
                       ? (
                           <div>
@@ -88,8 +89,8 @@ export default function BagletsPage() {
                         )
                       : '—'}
                   </td>
-                  <td className="py-3 px-4">
-                    <Button variant="ghost" size="sm" disabled>
+                  <td className="py-2 md:py-3 px-2 md:px-4">
+                    <Button variant="ghost" size="sm" disabled className="text-xs md:text-sm px-1.5 md:px-2 py-0.5 md:py-1">
                       + Metric
                     </Button>
                   </td>
@@ -99,6 +100,11 @@ export default function BagletsPage() {
           </table>
         </div>
       </Card>
+
+      <FloatingActionButton actions={[
+        { label: 'Add Metric', icon: '📊', href: '/metrics' },
+        { label: 'QR Scan', icon: '📱', href: '/batches' },
+      ]} />
     </div>
   );
 }

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import Logo from '@/components/ui/Logo';
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -28,7 +29,7 @@ export default function Sidebar() {
       {/* Mobile toggle button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-4 left-4 z-50 md:hidden bg-accent-green text-white p-2 rounded-lg"
+        className="fixed top-3 left-3 z-50 md:hidden bg-accent-leaf text-dark-bg p-2 rounded-lg flex items-center justify-center w-10 h-10"
       >
         ☰
       </button>
@@ -43,13 +44,16 @@ export default function Sidebar() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 h-screen w-64 bg-dark-surface border-r border-gray-700/50 shadow-lg z-40 transform transition-transform duration-300 ease-in-out md:translate-x-0 flex flex-col
+        className={`fixed left-0 top-0 h-screen w-64 bg-dark-surface border-r border-gray-800/20 shadow-lg z-40 transform transition-transform duration-300 ease-in-out md:translate-x-0 flex flex-col
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
         {/* Logo/Brand */}
-        <div className="p-6 border-b border-gray-700/50 bg-gradient-to-r from-accent-leaf/10 to-accent-sky/10">
-          <h1 className="text-2xl font-bold text-accent-leaf">🌱 Cultivator</h1>
-          <p className="text-xs text-gray-400 mt-1">Smart Farming System</p>
+        <div className="p-4 border-b border-gray-800/20">
+          <div className="flex items-center gap-3 mb-1">
+            <Logo className="w-8 h-8" />
+            <h1 className="text-xl font-semibold text-accent-leaf">Cultivator</h1>
+          </div>
+          <p className="text-xs text-gray-500 ml-11">Smart Cultivation</p>
         </div>
 
         {/* Navigation */}
@@ -60,10 +64,10 @@ export default function Sidebar() {
                 <Link
                   href={item.href}
                   onClick={() => setIsOpen(false)}
-                  className={`block px-4 py-2 rounded-lg transition-all ${
+                  className={`block px-2 py-1.5 rounded-lg transition-all border-l-2 text-sm ${
                     isActive(item.href)
-                      ? 'bg-accent-leaf/20 text-accent-leaf font-medium border border-accent-leaf/40'
-                      : 'text-gray-400 hover:bg-dark-surface-light/50 hover:text-gray-200'
+                      ? 'border-l-accent-leaf text-accent-leaf font-medium pl-2.5 bg-accent-leaf/5 nav-highlight'
+                      : 'text-gray-400 hover:bg-dark-surface-light/20 hover:text-gray-200 border-l-transparent'
                   }`}
                 >
                   {item.label}
@@ -74,10 +78,10 @@ export default function Sidebar() {
         </nav>
 
         {/* Footer info */}
-        <div className="p-4 border-t border-gray-700/50 text-xs text-gray-500 bg-dark-surface-light/30">
-          <p className="font-medium text-gray-400">🌿 Growing Sustainably</p>
-          <p className="mt-2 text-gray-600">IoT-enabled pods</p>
-          <p className="text-gray-600">Real-time monitoring</p>
+        <div className="p-3 border-t border-gray-800/20 text-xs text-gray-500">
+          <p className="font-medium text-gray-400">Growing with Precision</p>
+          <p className="mt-2 text-gray-600">Sustainably cultivated</p>
+          <p className="text-gray-600">Real-time insights</p>
         </div>
       </aside>
     </>

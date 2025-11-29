@@ -29,7 +29,7 @@ Table.displayName = 'Table';
 
 const TableHeader = React.forwardRef<HTMLTableSectionElement, TableHeaderProps>(
   ({ className = '', ...props }, ref) => (
-    <thead ref={ref} className={`border-b border-gray-700 ${className}`} {...props} />
+    <thead ref={ref} className={`border-b border-gray-800/20 ${className}`} {...props} />
   )
 );
 TableHeader.displayName = 'TableHeader';
@@ -45,7 +45,7 @@ const TableRow = React.forwardRef<HTMLTableRowElement, TableRowProps>(
   ({ className = '', ...props }, ref) => (
     <tr
       ref={ref}
-      className={`border-b border-gray-800 hover:bg-dark-surface-light transition-colors ${className}`}
+      className={`border-b border-gray-800/20 hover:bg-dark-surface-light/20 transition-colors ${className}`}
       {...props}
     />
   )
@@ -56,8 +56,8 @@ const TableCell = React.forwardRef<HTMLTableCellElement, TableCellProps>(
   ({ isHeader, className = '', ...props }, ref) => {
     const Component = isHeader ? 'th' : 'td';
     const baseStyles = isHeader
-      ? 'text-left py-3 px-4 font-semibold text-gray-200 bg-dark-surface-light'
-      : 'py-3 px-4 text-gray-300';
+      ? 'text-left py-3.5 px-4 font-semibold text-gray-200 bg-dark-surface-light/60 backdrop-blur-sm'
+      : 'py-3.5 px-4 text-gray-300';
 
     return React.createElement(Component, {
       ref,

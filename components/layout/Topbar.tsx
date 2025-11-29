@@ -1,15 +1,20 @@
 'use client';
 
+import Logo from '@/components/ui/Logo';
+
 export default function Topbar() {
   return (
-    <header className="fixed top-0 left-0 right-0 md:left-64 h-16 bg-dark-surface border-b border-gray-700/50 shadow-lg z-30 flex items-center px-8 bg-gradient-to-r from-dark-surface via-dark-surface to-dark-surface-light">
+    <header className="fixed top-0 left-0 right-0 md:left-64 h-13 md:h-14 bg-dark-surface/95 backdrop-blur-sm border-b border-gray-800/40 z-30 flex items-center px-14 md:px-6">
       <div className="flex items-center justify-between w-full">
-        <h2 className="text-xl font-semibold bg-gradient-to-r from-accent-leaf to-accent-sky bg-clip-text text-transparent">
-          ⚡ Smart Farm Management
-        </h2>
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent-leaf to-accent-sky text-dark-bg flex items-center justify-center font-semibold text-sm">
-            🌾
+        <div className="flex items-center gap-3">
+          <Logo className="w-8 h-8 md:w-7 md:h-7" />
+          <h2 className="text-base md:text-lg font-normal text-gray-200">
+            Cultivator
+          </h2>
+        </div>
+        <div className="flex items-center gap-3 md:gap-4">
+          <div className="w-8 md:w-9 h-8 md:h-9 rounded-full bg-accent-leaf/5 border border-accent-leaf/20 flex items-center justify-center text-xs font-medium text-accent-leaf hover-glow">
+            ◉
           </div>
         </div>
       </div>

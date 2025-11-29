@@ -3,6 +3,7 @@
 import DashboardStats from '@/components/dashboard/DashboardStats';
 import RecentBatches from '@/components/dashboard/RecentBatches';
 import RecentBaglets from '@/components/dashboard/RecentBaglets';
+import FloatingActionButton from '@/components/ui/FloatingActionButton';
 import { mockBatches, mockBaglets } from '@/lib/mock-data';
 import { BatchStatus, BagletStatus } from '@/lib/types';
 
@@ -24,10 +25,16 @@ export default function DashboardPage() {
     { label: 'Ready to Harvest', value: mockBatches.filter((b) => b.status === BatchStatus.ReadyToHarvest).length, icon: '🎯' },
   ];
 
+  const fabActions = [
+    { label: 'Create Batch', icon: '➕', href: '/batches' },
+    { label: 'QR Scan', icon: '📱', href: '/batches' },
+    { label: 'Add Metric', icon: '📊', href: '/metrics' },
+  ];
+
   return (
     <div>
       <DashboardStats stats={stats} />
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 md:gap-6">
         <div>
           <RecentBatches batches={mockBatches} />
         </div>
@@ -35,6 +42,7 @@ export default function DashboardPage() {
           <RecentBaglets baglets={mockBaglets} />
         </div>
       </div>
+      <FloatingActionButton actions={fabActions} />
     </div>
   );
 }

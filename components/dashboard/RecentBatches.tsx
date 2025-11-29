@@ -27,30 +27,30 @@ export default function RecentBatches({ batches }: { batches: Batch[] }) {
   const recent = batches.slice(0, 5);
 
   return (
-    <Card variant="default" className="mb-8">
-      <div className="flex items-center justify-between mb-5">
-        <h3 className="text-lg font-semibold text-gray-100">🌾 Recent Batches</h3>
-        <Link href="/batches" className="text-accent-leaf text-sm hover:text-accent-sky transition-colors">
+    <Card className="mb-6 md:mb-8">
+      <div className="flex items-center justify-between mb-4 md:mb-5">
+        <h3 className="text-base md:text-lg font-semibold text-gray-100">Recent Batches</h3>
+        <Link href="/batches" className="text-accent-leaf text-xs md:text-sm hover:text-accent-sky transition-colors">
           View all →
         </Link>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full text-xs md:text-sm">
           <thead>
-            <tr className="border-b border-gray-700/50">
-              <th className="text-left py-3 px-3 font-semibold text-gray-300">
+            <tr className="border-b border-gray-800/20 bg-dark-surface-light/60 backdrop-blur-sm">
+              <th className="text-left py-2.5 md:py-3 px-2 md:px-3 font-semibold text-gray-200 text-xs">
                 Batch ID
               </th>
-              <th className="text-left py-3 px-3 font-semibold text-gray-300">
+              <th className="text-left py-2.5 md:py-3 px-2 md:px-3 font-semibold text-gray-200 text-xs">
                 Type
               </th>
-              <th className="text-left py-3 px-3 font-semibold text-gray-300">
+              <th className="text-left py-2.5 md:py-3 px-2 md:px-3 font-semibold text-gray-200 text-xs hidden md:table-cell">
                 Baglets
               </th>
-              <th className="text-left py-3 px-3 font-semibold text-gray-300">
+              <th className="text-left py-2.5 md:py-3 px-2 md:px-3 font-semibold text-gray-200 text-xs">
                 Status
               </th>
-              <th className="text-left py-3 px-3 font-semibold text-gray-300">
+              <th className="text-left py-2.5 md:py-3 px-2 md:px-3 font-semibold text-gray-200 text-xs hidden md:table-cell">
                 Created
               </th>
             </tr>
@@ -59,23 +59,23 @@ export default function RecentBatches({ batches }: { batches: Batch[] }) {
             {recent.map((batch) => (
               <tr
                 key={batch.id}
-                className="border-b border-gray-700/50 hover:bg-dark-surface-light/50 transition-colors"
+                className="border-b border-gray-800/10 hover:bg-dark-surface-light/15 transition-colors"
               >
-                <td className="py-4 px-3">
-                  <Link href={`/batches/${batch.id}`} className="text-accent-leaf hover:text-accent-sky transition-colors">
+                <td className="py-3 md:py-3.5 px-2 md:px-3">
+                  <Link href={`/batches/${batch.id}`} className="text-accent-leaf hover:text-accent-sky transition-colors text-xs md:text-sm font-medium">
                     {batch.id}
                   </Link>
                 </td>
-                <td className="py-4 px-3 text-gray-400 font-medium">{batch.mushroomType}</td>
-                <td className="py-4 px-3 text-gray-400 font-medium">
+                <td className="py-3 md:py-3.5 px-2 md:px-3 text-gray-400 text-xs md:text-sm font-medium">{batch.mushroomType}</td>
+                <td className="py-3 md:py-3.5 px-2 md:px-3 text-gray-400 text-xs md:text-sm font-medium hidden md:table-cell">
                   {batch.actualBagletCount} / {batch.plannedBagletCount}
                 </td>
-                <td className="py-4 px-3">
+                <td className="py-3 md:py-3.5 px-2 md:px-3">
                   <Badge variant={statusVariantMap[batch.status]}>
                     {batch.status}
                   </Badge>
                 </td>
-                <td className="py-4 px-3 text-gray-500">
+                <td className="py-3 md:py-3.5 px-2 md:px-3 text-gray-500 text-xs md:text-sm hidden md:table-cell">
                   {formatDate(batch.createdDate)}
                 </td>
               </tr>
