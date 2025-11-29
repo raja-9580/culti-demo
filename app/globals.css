@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-dark-bg text-gray-100;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-dark-surface rounded-xl p-5 border border-gray-700/50 shadow-card;
+  }
+
+  .card-light {
+    @apply bg-dark-surface-light rounded-xl p-5 border border-gray-700/50 shadow-card;
+  }
+  
+  .nature-accent {
+    @apply text-accent-leaf;
+  }
+  
+  .tech-accent {
+    @apply text-accent-sky;
+  }
+}
