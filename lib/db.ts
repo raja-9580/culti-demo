@@ -1,29 +1,31 @@
-// Database client scaffold for Neon serverless PostgreSQL
-// TODO: Implement real database queries when Neon is set up
+// Database client for Neon serverless PostgreSQL
+import { neon } from '@neondatabase/serverless';
 
 const DATABASE_URL = process.env.DATABASE_URL;
 
 if (!DATABASE_URL) {
-  console.warn('DATABASE_URL is not set. Using mock data only.');
+  console.warn('DATABASE_URL is not set. Database queries will fail.');
 }
 
-export const db = {
-  // Placeholder for future database client
-  // e.g., const { Client } = require('pg');
-  // const client = new Client({ connectionString: DATABASE_URL });
+// Create SQL client
+export const sql = DATABASE_URL ? neon(DATABASE_URL) : null;
 
-  // TODO: Add actual query methods:
-  // - getBatches()
-  // - getBatch(id)
-  // - createBatch(batch)
-  // - updateBatch(id, batch)
-  // - getBaglets()
-  // - getBaglet(id)
-  // - createBaglet(baglet)
-  // - updateBaglet(id, baglet)
-  // - getMetrics(bagletId)
-  // - recordMetric(bagletId, metric)
-  // - etc.
-};
+// Helper to execute queries
+export async function query<T = any>(sqlQuery: string, params?: any[]): Promise<T[]> {
+  if (!sql) {
+    throw new Error('Database connection not configured. Set DATABASE_URL in .env');
+  }
 
-export default db;
+  try {
+    const result = params
+      ? await sql(sqlQuery, params)
+      : await sql(sqlQuery);
+
+    return result as T[];
+  } catch (error) {
+    console.error('Database query error:', error);
+    throw error;
+  }
+}
+
+export default { sql, query };
