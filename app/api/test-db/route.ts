@@ -10,20 +10,20 @@ export async function GET() {
             );
         }
 
-        // Query with schema-qualified table name
-        console.log('🧪 Querying "cultivator-db".batch with schema qualification');
-        const batches = await sql`SELECT * FROM "cultivator-db".batch LIMIT 10`;
+        // Query v_substrate_full view
+        console.log('🧪 Querying v_substrate_full without schema qualification');
+        const substrateData = await sql`SELECT * FROM v_substrate_full LIMIT 10`;
         
-        console.log(`✅ Found ${batches.length} batches`);
-        if (batches.length > 0) {
-            console.log('📦 First batch:', batches[0]);
+        console.log(`✅ Found ${substrateData.length} substrate records`);
+        if (substrateData.length > 0) {
+            console.log('📦 First substrate:', substrateData[0]);
         }
 
         return NextResponse.json({
             success: true,
-            message: 'Connected to cultivator-db schema',
-            count: batches.length,
-            data: batches
+            message: 'Successfully connected to database with search_path set',
+            count: substrateData.length,
+            data: substrateData
         });
 
     } catch (error: any) {

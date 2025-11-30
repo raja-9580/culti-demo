@@ -17,7 +17,7 @@ export async function GET() {
         bg.latest_weight_g,
         bg.latest_temp_c,
         bg.latest_humidity_pct
-      FROM "cultivator-db".baglet bg
+      FROM baglet bg
       WHERE bg.is_deleted = FALSE
     `;
 

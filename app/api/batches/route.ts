@@ -23,11 +23,11 @@ export async function GET() {
         s.substrate_name,
         st.strain_code,
         m.mushroom_name
-      FROM "cultivator-db".batch b
-      LEFT JOIN "cultivator-db".farm f ON b.farm_id = f.farm_id
-      LEFT JOIN "cultivator-db".substrate s ON b.substrate_id = s.substrate_id
-      LEFT JOIN "cultivator-db".strain st ON b.strain_code = st.strain_code
-      LEFT JOIN "cultivator-db".mushroom m ON st.mushroom_id = m.mushroom_id
+      FROM batch b
+      LEFT JOIN farm f ON b.farm_id = f.farm_id
+      LEFT JOIN substrate s ON b.substrate_id = s.substrate_id
+      LEFT JOIN strain st ON b.strain_code = st.strain_code
+      LEFT JOIN mushroom m ON st.mushroom_id = m.mushroom_id
       WHERE b.is_deleted = FALSE
       ORDER BY b.prepared_date DESC, b.batch_sequence DESC
     `;
