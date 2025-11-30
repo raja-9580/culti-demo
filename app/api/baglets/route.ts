@@ -1,28 +1,56 @@
 import { NextResponse } from 'next/server';
-import { sql } from '@/lib/db';
+import { neon } from '@neondatabase/serverless';
 
-export async function GET() {
+export async function GET(request: Request) {
+  const DATABASE_URL = process.env.DATABASE_URL;
+
+  if (!DATABASE_URL) {
+    return NextResponse.json({ error: 'Database configuration missing' }, { status: 500 });
+  }
+
+  const sql = neon(DATABASE_URL);
+
   try {
-    if (!sql) {
-      console.error('DATABASE_URL is not set');
-      return NextResponse.json({ error: 'Database configuration missing' }, { status: 500 });
-    }
+    // Get batch_id from query params
+    const { searchParams } = new URL(request.url);
+    const batchId = searchParams.get('batch_id');
 
-    const bagletsData = await sql`
-      SELECT
-        bg.baglet_id,
-        bg.batch_id,
-        bg.current_status,
-        bg.status_updated_at,
-        bg.latest_weight_g,
-        bg.latest_temp_c,
-        bg.latest_humidity_pct
-      FROM baglet bg
-      WHERE bg.is_deleted = FALSE
-    `;
+    let bagletsData;
+
+    if (batchId) {
+      // Filter by batch_id
+      bagletsData = await sql`
+        SELECT
+          bg.baglet_id,
+          bg.batch_id,
+          bg.current_status,
+          bg.status_updated_at,
+          bg.latest_weight_g,
+          bg.latest_temp_c,
+          bg.latest_humidity_pct
+        FROM baglet bg
+        WHERE bg.batch_id = ${batchId} AND bg.is_deleted = FALSE
+        ORDER BY bg.baglet_sequence ASC
+      `;
+    } else {
+      // Get all baglets
+      bagletsData = await sql`
+        SELECT
+          bg.baglet_id,
+          bg.batch_id,
+          bg.current_status,
+          bg.status_updated_at,
+          bg.latest_weight_g,
+          bg.latest_temp_c,
+          bg.latest_humidity_pct
+        FROM baglet bg
+        WHERE bg.is_deleted = FALSE
+      `;
+    }
 
     const baglets = bagletsData.map((row) => ({
       id: row.baglet_id,
+      baglet_id: row.baglet_id,
       batchId: row.batch_id,
       status: row.current_status,
       lastStatusChange: row.status_updated_at,

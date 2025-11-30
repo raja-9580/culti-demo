@@ -7,8 +7,8 @@ import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import Badge from '@/components/ui/Badge';
 import FloatingActionButton from '@/components/ui/FloatingActionButton';
+import CreateBatchModal from '@/components/batches/CreateBatchModal';
 import { MUSHROOM_TYPES, BatchStatus, Batch } from '@/lib/types';
-import Link from 'next/link';
 
 const statusVariantMap: Record<BatchStatus, 'success' | 'warning' | 'info' | 'danger' | 'neutral'> = {
   [BatchStatus.Planned]: 'info',
@@ -38,19 +38,21 @@ export default function BatchesPage() {
     dateTo: '',
   });
   const [showFilters, setShowFilters] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  async function fetchBatches() {
+    try {
+      const res = await fetch('/api/batches');
+      const data = await res.json();
+      if (data.batches) {
+        setBatches(data.batches);
+      }
+    } catch (error) {
+      console.error('Failed to fetch batches:', error);
+    }
+  }
 
   useEffect(() => {
-    async function fetchBatches() {
-      try {
-        const res = await fetch('/api/batches');
-        const data = await res.json();
-        if (data.batches) {
-          setBatches(data.batches);
-        }
-      } catch (error) {
-        console.error('Failed to fetch batches:', error);
-      }
-    }
     fetchBatches();
   }, []);
 
@@ -68,7 +70,13 @@ export default function BatchesPage() {
     <div>
       <div className="flex items-center justify-between mb-4 md:mb-5">
         <h1 className="text-xl md:text-2xl font-semibold text-accent-leaf">Batches</h1>
-        <Button variant="primary" className="hidden md:inline-flex">Create Batch</Button>
+        <Button
+          variant="primary"
+          className="hidden md:inline-flex"
+          onClick={() => setIsCreateModalOpen(true)}
+        >
+          Create Batch
+        </Button>
       </div>
 
       {/* Filters */}
@@ -159,9 +167,9 @@ export default function BatchesPage() {
                   className="border-b border-gray-800/20 hover:bg-dark-surface-light/20 transition-colors"
                 >
                   <td className="py-3 md:py-3.5 px-2 md:px-4">
-                    <Link href={`/batches/${batch.id}`} className="text-accent-leaf hover:text-accent-sky transition-colors text-xs md:text-sm font-medium">
+                    <a href={`/batches/${batch.id}`} className="text-accent-leaf hover:text-accent-sky transition-colors text-xs md:text-sm font-medium">
                       {batch.id}
-                    </Link>
+                    </a>
                   </td>
                   <td className="py-3 md:py-3.5 px-2 md:px-4 text-gray-400 text-xs md:text-sm font-medium">{batch.mushroomType}</td>
                   <td className="py-3 md:py-3.5 px-2 md:px-4 text-gray-500 text-xs md:text-sm hidden md:table-cell">
@@ -180,9 +188,12 @@ export default function BatchesPage() {
                   </td>
                   <td className="py-2 md:py-3 px-2 md:px-4">
                     <div className="flex gap-1 md:gap-2">
-                      <Button variant="ghost" size="sm" className="text-xs md:text-sm px-2 md:px-3 py-1 md:py-1.5">
+                      <a
+                        href={`/batches/${batch.id}`}
+                        className="text-gray-400 hover:text-accent-leaf hover:bg-dark-surface-light/20 transition-colors font-medium rounded-lg px-2 md:px-3 py-1 md:py-1.5 text-xs md:text-sm flex items-center"
+                      >
                         Details
-                      </Button>
+                      </a>
                       <Button variant="ghost" size="sm" className="text-xs md:text-sm px-2 md:px-3 py-1 md:py-1.5 hidden md:inline-flex">
                         QR
                       </Button>
@@ -200,8 +211,18 @@ export default function BatchesPage() {
         )}
       </Card>
 
+      <CreateBatchModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={fetchBatches}
+      />
+
       <FloatingActionButton actions={[
-        { label: 'Create Batch', icon: '➕', href: '/batches' },
+        {
+          label: 'Create Batch',
+          icon: '➕',
+          onClick: () => setIsCreateModalOpen(true)
+        },
         { label: 'QR Scan', icon: '📱', href: '/batches' },
       ]} />
     </div>

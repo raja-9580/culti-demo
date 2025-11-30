@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
-import BatchQrPanel from '@/components/batches/BatchQrPanel';
+import QRLabelGrid from '@/components/batches/QRLabelGrid';
 import { BatchStatus, Batch } from '@/lib/types';
 import Link from 'next/link';
 
@@ -32,6 +32,7 @@ export default function BatchDetailPage({
 }: {
   params: { id: string };
 }) {
+  console.log('BatchDetailPage mounted with params:', params);
   const [batch, setBatch] = useState<Batch | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -149,7 +150,7 @@ export default function BatchDetailPage({
         </Card>
       </div>
 
-      <BatchQrPanel batch={batch} bagletCount={batch.actualBagletCount} />
+      <QRLabelGrid batchId={batch.id} />
     </div>
   );
 }
