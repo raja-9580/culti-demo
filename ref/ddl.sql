@@ -90,6 +90,34 @@ CREATE TABLE baglet (
   is_deleted BOOLEAN DEFAULT FALSE
 );
 
+CREATE TABLE baglet_status_log (
+  status_log_id BIGSERIAL PRIMARY KEY,
+  baglet_id TEXT NOT NULL REFERENCES baglet(baglet_id),
+  batch_id TEXT NOT NULL REFERENCES batch(batch_id),
+  previous_status TEXT,
+  status TEXT NOT NULL,
+  notes TEXT,
+  logged_by TEXT,
+  logged_timestamp TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE VIEW v_strain_full AS
+SELECT
+    s.strain_code,
+    m.mushroom_id,
+    m.mushroom_name,
+    sv.strain_vendor_id,
+    sv.vendor_name
+FROM strain s
+JOIN mushroom m
+    ON s.mushroom_id = m.mushroom_id
+JOIN strain_vendor sv
+    ON s.strain_vendor_id = sv.strain_vendor_id
+ORDER BY
+    m.mushroom_name,
+    s.strain_code;
+
+
 CREATE VIEW v_substrate_full AS
 SELECT
   s.substrate_id,
