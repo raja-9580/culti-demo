@@ -27,24 +27,35 @@ function formatDate(date: Date | string | null | undefined): string {
   });
 }
 
+interface RecipeItem {
+  name: string;
+  qty: number;
+  unit: string;
+}
+
+interface BatchWithRecipe extends Batch {
+  recipe?: {
+    mediums: { medium_name: string; qty_g: number }[];
+    supplements: { supplement_name: string; qty: number; unit: string }[];
+  };
+}
+
 export default function BatchDetailPage({
   params,
 }: {
   params: { id: string };
 }) {
   console.log('BatchDetailPage mounted with params:', params);
-  const [batch, setBatch] = useState<Batch | null>(null);
+  const [batch, setBatch] = useState<BatchWithRecipe | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchBatch() {
       try {
-        const res = await fetch('/api/batches');
+        const res = await fetch(`/api/batches/${params.id}`);
+        if (!res.ok) throw new Error('Failed to fetch batch');
         const data = await res.json();
-        if (data.batches) {
-          const found = data.batches.find((b: Batch) => b.id === params.id);
-          setBatch(found || null);
-        }
+        setBatch(data.batch || null);
       } catch (error) {
         console.error('Failed to fetch batch:', error);
       } finally {
@@ -67,6 +78,29 @@ export default function BatchDetailPage({
         </Link>
       </div>
     );
+  }
+
+  // Calculate Recipe Totals
+  const BAG_WEIGHT_KG = 2;
+  const totalMixWeightKg = batch.plannedBagletCount * BAG_WEIGHT_KG;
+
+  const recipeItems: RecipeItem[] = [];
+
+  if (batch.recipe) {
+    batch.recipe.mediums.forEach((m) => {
+      recipeItems.push({
+        name: m.medium_name,
+        qty: m.qty_g * totalMixWeightKg, // qty_g is per kg of mix
+        unit: 'g',
+      });
+    });
+    batch.recipe.supplements.forEach((s) => {
+      recipeItems.push({
+        name: s.supplement_name,
+        qty: s.qty * totalMixWeightKg, // qty is per kg of mix
+        unit: s.unit || 'g',
+      });
+    });
   }
 
   return (
@@ -134,20 +168,41 @@ export default function BatchDetailPage({
           </div>
         </Card>
 
-        <Card variant="default">
-          <p className="text-sm font-semibold text-gray-300 mb-3">Actions</p>
-          <div className="space-y-2">
-            <Button variant="secondary" className="w-full">
-              📝 Add Baglets
-            </Button>
-            <Button variant="secondary" className="w-full">
-              📝 Update Status
-            </Button>
-            <Button variant="secondary" className="w-full">
-              🔗 View All Baglets
-            </Button>
-          </div>
-        </Card>
+        <div className="space-y-6">
+          {/* Recipe Section - Only visible if Planned */}
+          {batch.status === 'Planned' && recipeItems.length > 0 && (
+            <Card variant="default">
+              <p className="text-sm font-semibold text-gray-300 mb-3">
+                Recipe (Total for {batch.plannedBagletCount} bags @ {BAG_WEIGHT_KG}kg)
+              </p>
+              <div className="space-y-2 text-sm">
+                {recipeItems.map((item, idx) => (
+                  <div key={idx} className="flex justify-between border-b border-gray-800 pb-1 last:border-0">
+                    <span className="text-gray-400">{item.name}</span>
+                    <span className="text-accent-sky font-mono">
+                      {item.qty.toLocaleString()} {item.unit}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
+
+          <Card variant="default">
+            <p className="text-sm font-semibold text-gray-300 mb-3">Actions</p>
+            <div className="space-y-2">
+              <Button variant="secondary" className="w-full">
+                📝 Add Baglets
+              </Button>
+              <Button variant="secondary" className="w-full">
+                📝 Update Status
+              </Button>
+              <Button variant="secondary" className="w-full">
+                🔗 View All Baglets
+              </Button>
+            </div>
+          </Card>
+        </div>
       </div>
 
       <QRLabelGrid batchId={batch.id} />
