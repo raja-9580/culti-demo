@@ -9,7 +9,7 @@ export default function Topbar() {
         <div className="flex items-center gap-3">
           <Logo className="w-8 h-8 md:w-7 md:h-7" />
           <h2 className="text-base md:text-lg font-normal text-gray-200">
-            Cultivator
+            Cultivation Management System
           </h2>
         </div>
         <div className="flex items-center gap-3 md:gap-4">

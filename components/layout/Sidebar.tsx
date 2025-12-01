@@ -51,7 +51,7 @@ export default function Sidebar() {
         <div className="p-4 border-b border-gray-800/20">
           <div className="flex items-center gap-3 mb-1">
             <Logo className="w-8 h-8" />
-            <h1 className="text-xl font-semibold text-accent-leaf">Cultivator</h1>
+            <h1 className="text-xl font-semibold text-accent-leaf">Akaththi Farm</h1>
           </div>
           <p className="text-xs text-gray-500 ml-11">Smart Cultivation</p>
         </div>
@@ -65,8 +65,8 @@ export default function Sidebar() {
                   href={item.href}
                   onClick={() => setIsOpen(false)}
                   className={`block px-2 py-1.5 rounded-lg transition-all border-l-2 text-sm ${isActive(item.href)
-                      ? 'border-l-accent-leaf text-accent-leaf font-medium pl-2.5 bg-accent-leaf/5 nav-highlight'
-                      : 'text-gray-400 hover:bg-dark-surface-light/20 hover:text-gray-200 border-l-transparent'
+                    ? 'border-l-accent-leaf text-accent-leaf font-medium pl-2.5 bg-accent-leaf/5 nav-highlight'
+                    : 'text-gray-400 hover:bg-dark-surface-light/20 hover:text-gray-200 border-l-transparent'
                     }`}
                 >
                   {item.label}
