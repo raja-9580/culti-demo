@@ -4,6 +4,7 @@ export enum BatchStatus {
   Sterilized = 'Sterilized',
   Inoculated = 'Inoculated',
   Colonising = 'Colonising',
+  InProgress = 'In Progress',
   ReadyToHarvest = 'Ready to Harvest',
   Archived = 'Archived',
 }

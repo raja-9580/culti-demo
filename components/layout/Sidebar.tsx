@@ -64,11 +64,10 @@ export default function Sidebar() {
                 <Link
                   href={item.href}
                   onClick={() => setIsOpen(false)}
-                  className={`block px-2 py-1.5 rounded-lg transition-all border-l-2 text-sm ${
-                    isActive(item.href)
+                  className={`block px-2 py-1.5 rounded-lg transition-all border-l-2 text-sm ${isActive(item.href)
                       ? 'border-l-accent-leaf text-accent-leaf font-medium pl-2.5 bg-accent-leaf/5 nav-highlight'
                       : 'text-gray-400 hover:bg-dark-surface-light/20 hover:text-gray-200 border-l-transparent'
-                  }`}
+                    }`}
                 >
                   {item.label}
                 </Link>
@@ -79,9 +78,10 @@ export default function Sidebar() {
 
         {/* Footer info */}
         <div className="p-3 border-t border-gray-800/20 text-xs text-gray-500">
-          <p className="font-medium text-gray-400">Growing with Precision</p>
-          <p className="mt-2 text-gray-600">Sustainably cultivated</p>
-          <p className="text-gray-600">Real-time insights</p>
+          <p className="text-gray-400">
+            Engineered by{' '}
+            <span className="text-accent-leaf font-semibold">Raja Selvaraj</span>
+          </p>
         </div>
       </aside>
     </>

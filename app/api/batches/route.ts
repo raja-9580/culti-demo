@@ -39,30 +39,61 @@ export async function GET() {
         f.farm_name,
         s.substrate_name,
         st.strain_code,
-        m.mushroom_name
+        m.mushroom_name,
+        -- Aggregate baglet statuses to derive batch status
+        COUNT(DISTINCT bg.current_status) as status_count,
+        STRING_AGG(DISTINCT bg.current_status, ',') as all_statuses,
+        COUNT(bg.baglet_id) as actual_baglet_count
       FROM batch b
       LEFT JOIN farm f ON b.farm_id = f.farm_id
       LEFT JOIN substrate s ON b.substrate_id = s.substrate_id
       LEFT JOIN strain st ON b.strain_code = st.strain_code
       LEFT JOIN mushroom m ON st.mushroom_id = m.mushroom_id
+      LEFT JOIN baglet bg ON b.batch_id = bg.batch_id AND bg.is_deleted = FALSE
       WHERE b.is_deleted = FALSE
+      GROUP BY b.batch_id, b.farm_id, b.prepared_date, b.batch_sequence, 
+               b.substrate_id, b.strain_code, b.baglet_count, b.logged_timestamp,
+               f.farm_name, s.substrate_name, st.strain_code, m.mushroom_name
       ORDER BY b.prepared_date DESC, b.batch_sequence DESC
     `;
 
-    const batches = batchesData.map((row) => ({
-      id: row.batch_id,
-      mushroomType: row.mushroom_name,
-      substrateCode: row.substrate_id,
-      substrateDescription: row.substrate_name,
-      plannedBagletCount: row.baglet_count,
-      actualBagletCount: row.baglet_count,
-      status: 'Planned',
-      createdDate: row.logged_timestamp,
-      preparedDate: row.prepared_date,
-    }));
+    const batches = batchesData.map((row) => {
+      // Calculate batch status from baglet statuses
+      let batchStatus = 'Planned'; // Default
+
+      if (row.actual_baglet_count > 0 && row.all_statuses) {
+        const statuses = row.all_statuses.split(',');
+
+        if (statuses.length === 1) {
+          // All baglets have the same status
+          batchStatus = statuses[0];
+        } else {
+          // Mixed statuses - batch is in progress
+          batchStatus = 'In Progress';
+        }
+      }
+
+      return {
+        id: row.batch_id,
+        mushroomType: row.mushroom_name,
+        substrateCode: row.substrate_id,
+        substrateDescription: row.substrate_name,
+        plannedBagletCount: row.baglet_count,
+        actualBagletCount: row.actual_baglet_count || 0,
+        status: batchStatus,
+        createdDate: row.logged_timestamp,
+        preparedDate: row.prepared_date,
+      };
+    });
 
     console.log(`✅ Fetched ${batches.length} batches from database`);
-    return NextResponse.json({ batches });
+    return NextResponse.json({ batches }, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      }
+    });
 
   } catch (error: any) {
     console.error('❌ Database query failed:', error?.message);

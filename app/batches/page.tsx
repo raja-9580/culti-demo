@@ -15,6 +15,7 @@ const statusVariantMap: Record<BatchStatus, 'success' | 'warning' | 'info' | 'da
   [BatchStatus.Sterilized]: 'warning',
   [BatchStatus.Inoculated]: 'warning',
   [BatchStatus.Colonising]: 'warning',
+  [BatchStatus.InProgress]: 'info',
   [BatchStatus.ReadyToHarvest]: 'success',
   [BatchStatus.Archived]: 'neutral',
 };
@@ -39,6 +40,7 @@ export default function BatchesPage() {
   });
   const [showFilters, setShowFilters] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [updatingBatch, setUpdatingBatch] = useState<string | null>(null);
 
   async function fetchBatches() {
     try {
@@ -49,6 +51,43 @@ export default function BatchesPage() {
       }
     } catch (error) {
       console.error('Failed to fetch batches:', error);
+    }
+  }
+
+  async function handleStatusUpdate(batchId: string, action: 'sterilize' | 'inoculate') {
+    const actionName = action === 'sterilize' ? 'STERILIZED' : 'INOCULATED';
+    const currentStatus = action === 'sterilize' ? 'Planned' : 'Sterilized';
+
+    // Show confirmation dialog
+    const confirmed = window.confirm(
+      `Do you want to update the status of all baglets in "${currentStatus}" state in Batch "${batchId}" to "${actionName}"?`
+    );
+
+    if (!confirmed) return;
+
+    setUpdatingBatch(batchId);
+    try {
+      const res = await fetch(`/api/batches/${batchId}/update-status`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action,
+          updated_by: 'user@example.com', // TODO: Get from auth session
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to update status');
+      }
+
+      alert(`✅ Updated ${data.updated_count} baglets to ${data.to_status}`);
+      await fetchBatches(); // Refresh the list
+    } catch (error: any) {
+      alert(`❌ Error: ${error.message}`);
+    } finally {
+      setUpdatingBatch(null);
     }
   }
 
@@ -187,16 +226,39 @@ export default function BatchesPage() {
                     {formatDate(batch.createdDate)}
                   </td>
                   <td className="py-2 md:py-3 px-2 md:px-4">
-                    <div className="flex gap-1 md:gap-2">
+                    <div className="flex gap-1 md:gap-2 flex-wrap">
                       <a
                         href={`/batches/${batch.id}`}
                         className="text-gray-400 hover:text-accent-leaf hover:bg-dark-surface-light/20 transition-colors font-medium rounded-lg px-2 md:px-3 py-1 md:py-1.5 text-xs md:text-sm flex items-center"
                       >
                         Details
                       </a>
-                      <Button variant="ghost" size="sm" className="text-xs md:text-sm px-2 md:px-3 py-1 md:py-1.5 hidden md:inline-flex">
-                        QR
-                      </Button>
+
+                      {/* Flag Sterilized - Show if status is Planned or In Progress */}
+                      {(batch.status === 'Planned' || batch.status === 'In Progress') && (
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          className="text-xs md:text-sm px-2 md:px-3 py-1 md:py-1.5"
+                          onClick={() => handleStatusUpdate(batch.id, 'sterilize')}
+                          disabled={updatingBatch === batch.id}
+                        >
+                          {updatingBatch === batch.id ? '...' : '🔥 Sterilized'}
+                        </Button>
+                      )}
+
+                      {/* Flag Inoculated - Show if status is Sterilized or In Progress */}
+                      {(batch.status === 'Sterilized' || batch.status === 'In Progress') && (
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          className="text-xs md:text-sm px-2 md:px-3 py-1 md:py-1.5"
+                          onClick={() => handleStatusUpdate(batch.id, 'inoculate')}
+                          disabled={updatingBatch === batch.id}
+                        >
+                          {updatingBatch === batch.id ? '...' : '💉 Inoculated'}
+                        </Button>
+                      )}
                     </div>
                   </td>
                 </tr>

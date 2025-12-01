@@ -13,6 +13,7 @@ const statusVariantMap: Record<BatchStatus, 'success' | 'warning' | 'info' | 'da
   [BatchStatus.Sterilized]: 'warning',
   [BatchStatus.Inoculated]: 'warning',
   [BatchStatus.Colonising]: 'warning',
+  [BatchStatus.InProgress]: 'info',
   [BatchStatus.ReadyToHarvest]: 'success',
   [BatchStatus.Archived]: 'neutral',
 };
@@ -38,6 +39,7 @@ interface BatchWithRecipe extends Batch {
     mediums: { medium_name: string; qty_g: number }[];
     supplements: { supplement_name: string; qty: number; unit: string }[];
   };
+  statusBreakdown?: { status: string; count: number }[];
 }
 
 export default function BatchDetailPage({
@@ -48,22 +50,64 @@ export default function BatchDetailPage({
   console.log('BatchDetailPage mounted with params:', params);
   const [batch, setBatch] = useState<BatchWithRecipe | null>(null);
   const [loading, setLoading] = useState(true);
+  const [updatingStatus, setUpdatingStatus] = useState(false);
 
   useEffect(() => {
-    async function fetchBatch() {
-      try {
-        const res = await fetch(`/api/batches/${params.id}`);
-        if (!res.ok) throw new Error('Failed to fetch batch');
-        const data = await res.json();
-        setBatch(data.batch || null);
-      } catch (error) {
-        console.error('Failed to fetch batch:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
     fetchBatch();
   }, [params.id]);
+
+  async function fetchBatch() {
+    try {
+      const res = await fetch(`/api/batches/${params.id}`);
+      if (!res.ok) throw new Error('Failed to fetch batch');
+      const data = await res.json();
+      setBatch(data.batch || null);
+    } catch (error) {
+      console.error('Failed to fetch batch:', error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleStatusUpdate(action: 'sterilize' | 'inoculate') {
+    if (!batch) return;
+
+    const actionName = action === 'sterilize' ? 'STERILIZED' : 'INOCULATED';
+    const currentStatus = action === 'sterilize' ? 'Planned' : 'Sterilized';
+
+    const confirmed = window.confirm(
+      `Do you want to update the status of all baglets in "${currentStatus}" state in Batch "${batch.id}" to "${actionName}"?`
+    );
+
+    if (!confirmed) return;
+
+    setUpdatingStatus(true);
+    try {
+      const res = await fetch(`/api/batches/${batch.id}/update-status`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action,
+          updated_by: 'user@example.com',
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to update status');
+      }
+
+      alert(`✅ Updated ${data.updated_count} baglets to ${data.to_status}`);
+
+      // Refresh data
+      await fetchBatch();
+    } catch (error: any) {
+      alert(`❌ Error: ${error.message}`);
+    } finally {
+      setUpdatingStatus(false);
+    }
+  }
 
   if (loading) {
     return <div className="p-8 text-center text-gray-400">Loading batch details...</div>;
@@ -90,14 +134,14 @@ export default function BatchDetailPage({
     batch.recipe.mediums.forEach((m) => {
       recipeItems.push({
         name: m.medium_name,
-        qty: m.qty_g * totalMixWeightKg, // qty_g is per kg of mix
+        qty: m.qty_g * totalMixWeightKg,
         unit: 'g',
       });
     });
     batch.recipe.supplements.forEach((s) => {
       recipeItems.push({
         name: s.supplement_name,
-        qty: s.qty * totalMixWeightKg, // qty is per kg of mix
+        qty: s.qty * totalMixWeightKg,
         unit: s.unit || 'g',
       });
     });
@@ -114,18 +158,12 @@ export default function BatchDetailPage({
         <h1 className="text-3xl font-bold bg-gradient-to-r from-accent-leaf to-accent-sky bg-clip-text text-transparent mt-4">🌾 {batch.id}</h1>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <Card variant="default">
           <p className="text-xs text-gray-400 mb-1">Mushroom Type</p>
           <p className="text-xl font-semibold text-accent-leaf">
             {batch.mushroomType}
           </p>
-        </Card>
-        <Card variant="default">
-          <p className="text-xs text-gray-400 mb-1">Status</p>
-          <Badge variant={statusVariantMap[batch.status]}>
-            {batch.status}
-          </Badge>
         </Card>
         <Card variant="default">
           <p className="text-xs text-gray-400 mb-1">Baglets</p>
@@ -191,12 +229,30 @@ export default function BatchDetailPage({
           <Card variant="default">
             <p className="text-sm font-semibold text-gray-300 mb-3">Actions</p>
             <div className="space-y-2">
-              <Button variant="secondary" className="w-full">
-                📝 Add Baglets
-              </Button>
-              <Button variant="secondary" className="w-full">
-                📝 Update Status
-              </Button>
+              {/* Flag Sterilized - Show if any baglet is Planned */}
+              {batch.statusBreakdown?.some(s => s.status === 'Planned') && (
+                <Button
+                  variant="primary"
+                  className="w-full"
+                  onClick={() => handleStatusUpdate('sterilize')}
+                  disabled={updatingStatus}
+                >
+                  {updatingStatus ? 'Updating...' : '🔥 Flag as Sterilized'}
+                </Button>
+              )}
+
+              {/* Flag Inoculated - Show if any baglet is Sterilized */}
+              {batch.statusBreakdown?.some(s => s.status === 'Sterilized') && (
+                <Button
+                  variant="primary"
+                  className="w-full"
+                  onClick={() => handleStatusUpdate('inoculate')}
+                  disabled={updatingStatus}
+                >
+                  {updatingStatus ? 'Updating...' : '💉 Flag as Inoculated'}
+                </Button>
+              )}
+
               <Button variant="secondary" className="w-full">
                 🔗 View All Baglets
               </Button>

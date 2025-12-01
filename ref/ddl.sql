@@ -79,6 +79,9 @@ CREATE TABLE baglet (
   baglet_id TEXT PRIMARY KEY,
   batch_id TEXT NOT NULL REFERENCES batch(batch_id),
   baglet_sequence INT NOT NULL,
+  -- Stores the *latest* status for fast lookup.
+  -- UI needs this for lists, dashboards, filters.
+  -- Avoids expensive "get last log row" queries for every baglet.
   current_status TEXT,
   status_updated_at TIMESTAMPTZ,
   latest_weight_g NUMERIC,
